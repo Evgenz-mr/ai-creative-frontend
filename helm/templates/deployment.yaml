@@ -12,6 +12,10 @@ spec:
       labels:
         app.kubernetes.io/name: {{ .Release.Name }}
     spec:
+{{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+{{- end }}
       containers:
         - name: frontend
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

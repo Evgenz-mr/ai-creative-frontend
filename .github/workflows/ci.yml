@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   verify:
@@ -18,5 +19,28 @@ jobs:
           node-version: '22'
       - run: npm install
       - run: npm run build
-      - name: Build image
-        run: docker build -t ai-creative-frontend:${{ github.sha }} .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image on pull request
+        if: github.event_name == 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: ghcr.io/evgenz-mr/ai-creative-frontend:${{ github.sha }}
+      - name: Build and push image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/evgenz-mr/ai-creative-frontend:${{ github.sha }}
+            ghcr.io/evgenz-mr/ai-creative-frontend:latest

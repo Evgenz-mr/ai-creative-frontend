@@ -1,11 +1,11 @@
 export type Profile = { name: string; role: string; tagline: string };
 export type Project = { slug: string; title: string; type: string };
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+const apiUrl = process.env.API_URL ?? 'http://localhost:8080';
 
 async function request<T>(path: string, fallback: T): Promise<T> {
   try {
-    const response = await fetch(`${apiUrl}${path}`, { next: { revalidate: 30 } });
+    const response = await fetch(`${apiUrl}${path}`, { cache: 'no-store' });
     if (!response.ok) return fallback;
     return await response.json() as T;
   } catch {

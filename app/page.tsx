@@ -1,5 +1,7 @@
 import { getProfile, getProjects } from '../lib/api';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const [profile, projects] = await Promise.all([getProfile(), getProjects()]);
 
